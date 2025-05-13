@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>INVESTMENT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark fixed-top d-flex justify-content-end px-3">
+        <div class="dropdown">
+            <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="fas fa-user"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" onclick="loadContent('/profile'); return false;">Profile</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('bp.logout') }}">Log out</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="wrapper d-flex">
+        <div id="sidebar" class="sidebar collapsed d-flex flex-column p-3">
+            {% block sidebar %}{% endblock %}
+        </div>
+
+        <!--  This block is used for dynamic content -->
+        <div id="main" class="main-content expanded flex-grow-1">
+            <div id="content-area">
+                {% block content %}
+                <h1>hello</h1>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 🔽 Your custom script -->
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

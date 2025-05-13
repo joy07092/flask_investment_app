@@ -1,0 +1,12 @@
+<div class="card p-3 shadow">
+    <h5 class="mb-2 text-center">User Profile</h5>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email if user.email else 'Not provided' }}</p>
+    <p><strong>Mobile Number:</strong> {{ user.mobile_number if user.mobile_number else 'Not provided' }}</p>
+    <p><strong>User Type:</strong> {{ user.user_type }}</p>
+    <p><strong>Status:</strong> {{ user.status }}</p>
+    <p><strong>Created At:</strong> {{ user.created_at }}</p>
+    <p><strong>Updated At:</strong> {{ user.updated_at }}</p>
+    <p><strong>Created By:</strong> {{ user.created_by if user.created_by else 'Not available' }}</p>
+    <p><strong>Updated By:</strong> {{ user.updated_by if user.updated_by else 'Not available' }}</p>
+</div>
