@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 0px;">
+    <div class="card shadow" style="max-width: 700px; width: 100%; padding: 1rem 1.5rem;">
+        <h5 class="mb-3 text-center">User Profile</h5>
+        <p class="mb-2"><strong>Username:</strong> {{ user.username }}</p>
+        <p class="mb-2"><strong>Email:</strong> {{ user.email if user.email else 'Not provided' }}</p>
+        <p class="mb-2"><strong>Mobile Number:</strong> {{ user.mobile_number if user.mobile_number else 'Not provided'}}</p>
+        <p class="mb-2"><strong>User Type:</strong> {{ user.user_type }}</p>
+        <p class="mb-2"><strong>Status:</strong> {{ user.status }}</p>
+        <p class="mb-2"><strong>Created At:</strong> {{ user.created_at }}</p>
+        <p class="mb-2"><strong>Updated At:</strong> {{ user.updated_at }}</p>
+        <p class="mb-2"><strong>Created By:</strong> {{ user.created_by if user.created_by else 'Not available' }}</p>
+        <p class="mb-0"><strong>Updated By:</strong> {{ user.updated_by if user.updated_by else 'Not available' }}</p>
+    </div>
+</div>
+{% endblock %}
