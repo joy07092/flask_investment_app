@@ -1,8 +1,10 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
-from app.models import Users
-from werkzeug.security import check_password_hash
-from .utils import nocache, role_required
+from app.models import Users, Clients
+from werkzeug.security import check_password_hash, generate_password_hash
+from datetime import datetime, timezone
+from .utils import nocache, role_required, save_image
+from app import db
 
 bp = Blueprint("bp", __name__)
 
@@ -114,4 +116,146 @@ def profile():
     except Exception as e:
         flash(f"An error occurred while fetching the user profile: {str(e)}", "danger")
         return redirect(url_for('bp.home'))
+
+
+
+
+
+
+@bp.route("/createClient", methods=["POST"])
+@login_required
+@role_required('Admin')
+def createClient():
+    try:
+        
+        name = request.form['name']
+        mobile = request.form['mobile']
+        nid = request.form['nid']
+        status = request.form['status']
+
+        
+        existing_client = Clients.query.filter_by(name=name).first()
+        if existing_client:
+            flash("Client already exists", "warning")
+            return redirect(url_for("bp.users"))
+
+        
+        email = request.form['email'] or None
+        emergency_contact = request.form['emergency_contact'] or None
+        present_address = request.form['present_address'] or None
+        permanent_address = request.form['permanent_address'] or None
+        nominee_name = request.form['nominee_name'] or None
+        nominee_nid = request.form['nominee_nid'] or None
+        nominee_mobile = request.form['nominee_mobile'] or None
+
+        
+        image_file = request.files.get("image")
+        image_filename = save_image(image_file) 
+
+        
+        new_client = Clients(
+            name=name,
+            mobile=mobile,
+            nid=nid,
+            status=status,
+            email=email,
+            emergency_contact=emergency_contact,
+            present_address=present_address,
+            permanent_address=permanent_address,
+            nominee_name=nominee_name,
+            nominee_nid=nominee_nid,
+            nominee_mobile=nominee_mobile,
+            image=image_filename,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            created_by=current_user.username,
+            updated_by=None
+        )
+
+        
+        db.session.add(new_client)
+        db.session.commit()
+        flash("Client created successfully", "success")
+        return redirect(url_for("bp.users"))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred: {str(e)}", "danger")
+        return redirect(url_for("bp.users"))
+
+
+
+
+
+
+@bp.route("/createUser", methods=["POST"])
+@login_required
+@role_required('Admin')
+def createUser():
+    try:
+        data = request.form
+
+        user_type = data.get('user_type')
+        username = data.get('username')
+        email = data.get('email')
+        mobile_number = data.get('mobile_number')
+        password = data.get('password')
+        confirm_password = data.get('confirm_password')
+        status = data.get('status')
+        client_id = data.get('client_id') if user_type == 'Client' else None
+
+        
+
+        
+        if Users.query.filter_by(username=username).first():
+            flash('Username already exists. Please choose a different one.', 'danger')
+            return redirect(url_for("bp.users"))
+
+        
+        if user_type == 'Client':
+            if not client_id or not client_id.isdigit():
+                flash('Client ID must be a valid number.', 'danger')
+                return redirect(url_for("bp.users"))
+
+            client = Clients.query.get(int(client_id))
+            if not client:
+                flash('Client ID does not exist in the clients table.', 'danger')
+                return redirect(url_for("bp.users"))
+
+            
+            existing_user = Users.query.filter_by(client_id=int(client_id)).first()
+            if existing_user:
+                flash('This Client ID is already assigned to another user.', 'danger')
+                return redirect(url_for("bp.users"))
+
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return redirect(url_for("bp.users"))
+
+        
+        new_user = Users(
+            user_type=user_type,
+            username=username,
+            email=email,
+            mobile_number=mobile_number,
+            password=generate_password_hash(password),
+            status=status,
+            client_id=int(client_id) if client_id else None,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            created_by=current_user.username,
+            updated_by=None
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('User created successfully.', 'success')
+        return redirect(url_for("bp.users"))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred while creating the user: {str(e)}', 'danger')
+        return redirect(url_for("bp.users"))
 

@@ -26,28 +26,29 @@ function loadContent(endpoint) {  //only with button without changing link
 
 
 
-function toggleClientId() {  //used in user table creation form
-        const userType = document.getElementById('userType').value;
-        const clientIdField = document.getElementById('clientIdField');
-        const clientIdInput = document.getElementById('clientIdInput');
+function toggleClientId() {
+    const userType = document.getElementById('userType')?.value;
+    const clientIdField = document.getElementById('clientIdField');
+    const clientIdInput = document.getElementById('clientIdInput');
 
-        if (userType === 'Client') {
-            clientIdField.style.display = 'flex';
-            clientIdInput.setAttribute('required', 'required');
-        } else {
-            clientIdField.style.display = 'none';
-            clientIdInput.removeAttribute('required');
-        }
+    if (!clientIdField || !clientIdInput) return;
+
+    if (userType === 'Client') {
+        clientIdField.style.display = 'flex';  // Use 'flex' for Bootstrap row layout
+        clientIdInput.setAttribute('required', 'required');
+    } else {
+        clientIdField.style.display = 'none';
+        clientIdInput.removeAttribute('required');
+        clientIdInput.value = '';  // Clear stale value
     }
-
-
-
-function toggleVisibility(id) {   //password view or hide
-    const input = document.getElementById(id);
-    input.type = input.type === "password" ? "text" : "password";
 }
 
 
+
+function toggleVisibility(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
 
 function hideForm(id) {
     const formContainer = document.getElementById(id);
@@ -59,12 +60,25 @@ function hideForm(id) {
 }
 
 function showForm(id) {
-    const formContainer = document.getElementById(id);
-    if (formContainer) {
-        const form = formContainer.querySelector('form');
-        if (form) form.reset();  
-        formContainer.style.display = 'block';
-    }
+    const allForms = ['user-form', 'client-form'];
+
+    allForms.forEach(formId => {
+        const form = document.getElementById(formId);
+        if (form) {
+            if (formId === id) {
+                // Toggle the visibility: if already visible, hide it
+                const isVisible = form.style.display === 'block';
+                if (isVisible) {
+                    hideForm(formId);
+                } else {
+                    form.style.display = 'block';
+                }
+            } else {
+                hideForm(formId);
+            }
+        }
+    });
 }
+
 
 

@@ -32,3 +32,14 @@ html, body {
     padding: 20px;
     position: relative; 
 }
+
+
+.flash-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1030;
+    width: 90%;
+    max-width: 600px;
+  }

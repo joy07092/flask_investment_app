@@ -3,12 +3,13 @@
 {% block content %}
 <div class="border p-2" style="margin-top: -70px;">
     <button class="btn btn-primary me-2" id="create-user-btn" onclick="showForm('user-form')">
-    <i class="fas fa-plus"></i> Create User
-</button>
-    <button class="btn btn-success">
+        <i class="fas fa-plus"></i> Create User
+    </button>
+    <button class="btn btn-success" onclick="showForm('client-form')">
         <i class="fas fa-plus"></i> Create Client
     </button>
 </div>
+
 
 <!-- Hidden Form -->
 <div id="user-form" class="card shadow p-4" style="display: none; max-width: 700px; margin-top: -40px; margin-left: auto; margin-right: auto;">
@@ -17,14 +18,14 @@
         <button type="button" class="btn-close" aria-label="Close" onclick="hideForm('user-form')"></button>
     </div>
     
-    <form>
+    <form method="POST" action="{{ url_for('bp.createUser') }}">
         <!-- User Type -->
         <div class="row mb-3 align-items-center">
             <div class="col-sm-3 text-start">
                 <label for="userType" class="form-label mb-0">User Type<span class="text-danger">*</span></label>
             </div>
             <div class="col-sm-9">
-                <select id="userType" class="form-select" required onchange="toggleClientId()">
+                <select id="userType" name="user_type" class="form-select" required onchange="toggleClientId()">
                     <option value="">Select User Type</option>
                     <option value="Admin">Admin</option>
                     <option value="Client">Client</option>
@@ -38,7 +39,7 @@
                 <label class="form-label mb-0">Username<span class="text-danger">*</span></label>
             </div>
             <div class="col-sm-9">
-                <input type="text" class="form-control" required placeholder="Username">
+                <input type="text" name="username" class="form-control" required placeholder="Username">
             </div>
         </div>
 
@@ -48,7 +49,7 @@
                 <label class="form-label mb-0">Email<span class="text-danger">*</span></label>
             </div>
             <div class="col-sm-9">
-                <input type="email" class="form-control" required placeholder="Email">
+                <input type="email" name="email" class="form-control" required placeholder="Email">
             </div>
         </div>
 
@@ -58,36 +59,35 @@
                 <label class="form-label mb-0">Mobile Number</label>
             </div>
             <div class="col-sm-9">
-                <input type="text" class="form-control" placeholder="Mobile Number">
+                <input type="text" name="mobile" class="form-control" placeholder="Mobile Number">
             </div>
         </div>
 
         <!-- Password -->
-<div class="row mb-3 align-items-center">
-  <div class="col-sm-3 text-start">
-    <label class="form-label mb-0">Password<span class="text-danger">*</span></label>
-  </div>
-  <div class="col-sm-9">
-    <div class="d-flex align-items-center">
-      <input type="password" class="form-control me-2" id="password" required placeholder="Password" style="width: 95%;">
-      <button type="button" onclick="toggleVisibility('password')" class="btn btn-outline-secondary btn-sm">👁</button>
-    </div>
-  </div>
-</div>
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Password<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <div class="d-flex align-items-center">
+                    <input type="password" name="password" class="form-control me-2" id="password" required placeholder="Password" style="width: 95%;">
+                    <button type="button" onclick="toggleVisibility('password')" class="btn btn-outline-secondary btn-sm">👁</button>
+                </div>
+            </div>
+        </div>
 
-<!-- Confirm Password -->
-<div class="row mb-3 align-items-center">
-  <div class="col-sm-3 text-start">
-    <label class="form-label mb-0">Confirm Password<span class="text-danger">*</span></label>
-  </div>
-  <div class="col-sm-9">
-    <div class="d-flex align-items-center">
-      <input type="password" class="form-control me-2" id="confirmPassword" required placeholder="Confirm Password" style="width: 95%;">
-      <button type="button" onclick="toggleVisibility('confirmPassword')" class="btn btn-outline-secondary btn-sm">👁</button>
-    </div>
-  </div>
-</div>
-
+        <!-- Confirm Password -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Confirm Password<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <div class="d-flex align-items-center">
+                    <input type="password" name="confirm_password" class="form-control me-2" id="confirmPassword" required placeholder="Confirm Password" style="width: 95%;">
+                    <button type="button" onclick="toggleVisibility('confirmPassword')" class="btn btn-outline-secondary btn-sm">👁</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Status -->
         <div class="row mb-3 align-items-center">
@@ -95,7 +95,7 @@
                 <label class="form-label mb-0">Status<span class="text-danger">*</span></label>
             </div>
             <div class="col-sm-9">
-                <select class="form-select" required>
+                <select name="status" class="form-select" required>
                     <option value="">Select Status</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
@@ -109,18 +109,166 @@
                 <label class="form-label mb-0">Client ID<span class="text-danger">*</span></label>
             </div>
             <div class="col-sm-9">
-                <input type="text" class="form-control" placeholder="Client ID" id="clientIdInput">
+                <input type="text" class="form-control" name="client_id" placeholder="Client ID" id="clientIdInput">
+            </div>
+        </div>
+
+        
+
+
+
+        <!-- Submit Button -->
+        <div class="row mt-3">
+            <div class="col-sm-9 offset-sm-3">
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- Hidden Client Form -->
+<div id="client-form" class="card shadow p-4" style="display: none; max-width: 700px; margin-top: -40px; margin-left: auto; margin-right: auto;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Create Client Form</h5>
+        <button type="button" class="btn-close" aria-label="Close" onclick="hideForm('client-form')"></button>
+    </div>
+
+    <form action="/createClient" method="POST" enctype="multipart/form-data">
+        <!-- Name -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Name<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="name" required placeholder="Full Name">
+            </div>
+        </div>
+
+        <!-- Mobile -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Mobile<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="mobile" required placeholder="Mobile Number">
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Email</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="email" class="form-control" name="email" placeholder="Email (optional)">
+            </div>
+        </div>
+
+        <!-- NID -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">NID<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="nid" required placeholder="NID Number">
+            </div>
+        </div>
+
+        <!-- Image -->
+        <div class="row mb-3 align-items-center">
+    <div class="col-sm-3 text-start">
+      <label class="form-label mb-0">Image</label>
+    </div>
+    <div class="col-sm-9">
+      <input type="file" class="form-control" name="image">
+    </div>
+  </div>
+
+        <!-- Emergency Contact -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Emergency Contact</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="emergency_contact" placeholder="Emergency Contact Number">
+            </div>
+        </div>
+
+        <!-- Present Address -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Present Address</label>
+            </div>
+            <div class="col-sm-9">
+                <textarea class="form-control" name="present_address" rows="2" placeholder="Present Address"></textarea>
+            </div>
+        </div>
+
+        <!-- Permanent Address -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Permanent Address</label>
+            </div>
+            <div class="col-sm-9">
+                <textarea class="form-control" name="permanent_address" rows="2" placeholder="Permanent Address"></textarea>
+            </div>
+        </div>
+
+        <!-- Nominee Name -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Nominee Name</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="nominee_name" placeholder="Nominee Name">
+            </div>
+        </div>
+
+        <!-- Nominee NID -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Nominee NID</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="nominee_nid" placeholder="Nominee NID">
+            </div>
+        </div>
+
+        <!-- Nominee Mobile -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Nominee Mobile</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="nominee_mobile" placeholder="Nominee Mobile Number">
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Status<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <select class="form-select" name="status" required>
+                    <option value="">Select Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
             </div>
         </div>
 
         <!-- Submit Button -->
         <div class="row mt-3">
             <div class="col-sm-9 offset-sm-3">
-                <button class="btn btn-primary w-100">Register</button>
+                <button type="submit" class="btn btn-success w-100">Register</button>
             </div>
         </div>
     </form>
 </div>
+
+
 
 
 {% endblock %}

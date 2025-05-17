@@ -1,6 +1,8 @@
 from functools import wraps
-from flask import make_response, abort
+from flask import make_response, abort, current_app
 from flask_login import current_user
+import os
+from werkzeug.utils import secure_filename
 
 def nocache(view):
     @wraps(view)
@@ -22,3 +24,26 @@ def role_required(role):
             return f(*args, **kwargs)
         return wrapped
     return decorator
+
+
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_image(image_file):
+    if image_file and image_file.filename != "":
+        if allowed_file(image_file.filename):
+            filename = secure_filename(image_file.filename)
+            upload_path = os.path.join(current_app.root_path, 'static/uploads', filename)
+
+            
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+
+            image_file.save(upload_path)
+            return filename 
+        else:
+            return None 
+    return None
+
