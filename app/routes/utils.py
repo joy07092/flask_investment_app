@@ -27,23 +27,22 @@ def role_required(role):
 
 
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'doc', 'docx'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_image(image_file):
-    if image_file and image_file.filename != "":
-        if allowed_file(image_file.filename):
-            filename = secure_filename(image_file.filename)
+def save_file(upload_file):
+    if upload_file and upload_file.filename != "":
+        if allowed_file(upload_file.filename):
+            filename = secure_filename(upload_file.filename)
             upload_path = os.path.join(current_app.root_path, 'static/uploads', filename)
 
-            
             os.makedirs(os.path.dirname(upload_path), exist_ok=True)
 
-            image_file.save(upload_path)
-            return filename 
+            upload_file.save(upload_path)
+            return filename
         else:
-            return None 
+            return None
     return None
 

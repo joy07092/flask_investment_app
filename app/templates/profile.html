@@ -1,18 +1,91 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="display: flex; justify-content: center; align-items: flex-start; margin-top: 0px;">
-    <div class="card shadow" style="max-width: 700px; width: 100%; padding: 1rem 1.5rem;">
+<div style="display: flex; justify-content: center; align-items: flex-start; margin-top: -30px;">
+    <div class="card shadow" style="max-width: 700px; width: 100%; padding: 1rem 1.5rem; position: relative;">
+
+        <!-- Change Password Button -->
+        <button class="btn btn-outline-primary btn-sm" style="position: absolute; top: 1rem; right: 1.5rem;" onclick="showForm('password-form')">
+            <i class="bi bi-lock-fill"></i> Change Password
+        </button>
+
         <h5 class="mb-3 text-center">User Profile</h5>
         <p class="mb-2"><strong>Username:</strong> {{ user.username }}</p>
         <p class="mb-2"><strong>Email:</strong> {{ user.email if user.email else 'Not provided' }}</p>
         <p class="mb-2"><strong>Mobile Number:</strong> {{ user.mobile_number if user.mobile_number else 'Not provided'}}</p>
         <p class="mb-2"><strong>User Type:</strong> {{ user.user_type }}</p>
-        <p class="mb-2"><strong>Status:</strong> {{ user.status }}</p>
+        <p class="mb-2"><strong>Client ID:</strong> {{ user.client_id }}</p>
+        <p class="mb-2">
+            <strong>Status:</strong>
+            {% if user.status == 'Active' %}
+                <span class="text-success">{{ user.status }}</span>
+            {% else %}
+                <span class="text-danger">{{ user.status }}</span>
+            {% endif %}
+        </p>
         <p class="mb-2"><strong>Created At:</strong> {{ user.created_at }}</p>
         <p class="mb-2"><strong>Updated At:</strong> {{ user.updated_at }}</p>
         <p class="mb-2"><strong>Created By:</strong> {{ user.created_by if user.created_by else 'Not available' }}</p>
         <p class="mb-0"><strong>Updated By:</strong> {{ user.updated_by if user.updated_by else 'Not available' }}</p>
     </div>
 </div>
+
+<!-- Hidden Change Password Form -->
+<div id="password-form" class="card shadow p-4" style="display: none; max-width: 700px; margin-top: -400px; margin-left: auto; margin-right: auto; height: 400px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Change Password</h5>
+        <button type="button" class="btn-close" aria-label="Close" onclick="hideForm('password-form')"></button>
+    </div>
+
+    <form action="{{ url_for('bp.changePassword') }}" method="POST">
+        <!-- Current Password -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-4 text-start">
+        <label class="form-label mb-0">Current Password<span class="text-danger">*</span></label>
+    </div>
+    <div class="col-sm-8">
+        <div class="d-flex align-items-center">
+            <input type="password" class="form-control me-2" id="currentPassword" name="current_password" required placeholder="Current Password" style="width: 95%;">
+            <button type="button" onclick="toggleVisibility('currentPassword')" class="btn btn-outline-secondary btn-sm">👁</button>
+        </div>
+    </div>
+</div>
+
+<!-- New Password -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-4 text-start">
+        <label class="form-label mb-0">New Password<span class="text-danger">*</span></label>
+    </div>
+    <div class="col-sm-8">
+        <div class="d-flex align-items-center">
+            <input type="password" class="form-control me-2" id="newPassword" name="new_password" required placeholder="New Password" style="width: 95%;">
+            <button type="button" onclick="toggleVisibility('newPassword')" class="btn btn-outline-secondary btn-sm">👁</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm New Password -->
+<div class="row mb-3 align-items-center">
+    <div class="col-sm-4 text-start">
+        <label class="form-label mb-0">Confirm Password<span class="text-danger">*</span></label>
+    </div>
+    <div class="col-sm-8">
+        <div class="d-flex align-items-center">
+            <input type="password" class="form-control me-2" id="confirmNewPassword" name="confirm_password" required placeholder="Confirm New Password" style="width: 95%;">
+            <button type="button" onclick="toggleVisibility('confirmNewPassword')" class="btn btn-outline-secondary btn-sm">👁</button>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Submit -->
+        <div class="row mt-3">
+            <div class="col-sm-8 offset-sm-4">
+                <button type="submit" class="btn btn-primary w-100">Change Password</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
 {% endblock %}

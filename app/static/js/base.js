@@ -60,24 +60,12 @@ function hideForm(id) {
 }
 
 function showForm(id) {
-    const allForms = ['user-form', 'client-form'];
-
-    allForms.forEach(formId => {
-        const form = document.getElementById(formId);
-        if (form) {
-            if (formId === id) {
-                // Toggle the visibility: if already visible, hide it
-                const isVisible = form.style.display === 'block';
-                if (isVisible) {
-                    hideForm(formId);
-                } else {
-                    form.style.display = 'block';
-                }
-            } else {
-                hideForm(formId);
-            }
-        }
-    });
+    const formContainer = document.getElementById(id);
+    if (formContainer) {
+        const form = formContainer.querySelector('form');
+        if (form) form.reset();  
+        formContainer.style.display = 'block';
+    }
 }
 
 

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="border p-2" style="margin-top: -70px;">
+    <button class="btn btn-primary me-2" onclick="showForm('deposit-form')">
+        <i class="fas fa-plus"></i> Create Deposit
+    </button>
+</div>
+
+<!-- Hidden Deposit Form -->
+<div id="deposit-form" class="card shadow p-4" style="display: none; max-width: 700px; margin-top: -40px; margin-left: auto; margin-right: auto;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Create Deposit Form</h5>
+        <button type="button" class="btn-close" aria-label="Close" onclick="hideForm('deposit-form')"></button>
+    </div>
+
+    <form method="POST" action="{{ url_for('bp.createDeposit') }}" enctype="multipart/form-data">
+        <!-- Client ID -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Client ID<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                {% if current_user.user_type == 'Client' %}
+                    <input type="number" class="form-control" name="client_id" value="{{ current_user.client_id }}" readonly required>
+                {% else %}
+                    <input type="number" class="form-control" name="client_id" required placeholder="Client ID">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Month -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Month<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <input type="month" class="form-control" name="month" required>
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Date<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <input type="date" class="form-control" name="date" required>
+            </div>
+        </div>
+
+        <!-- Amount -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Amount<span class="text-danger">*</span></label>
+            </div>
+            <div class="col-sm-9">
+                <input type="number" step="0.01" class="form-control" name="amount" required placeholder="Enter Amount">
+            </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Comments</label>
+            </div>
+            <div class="col-sm-9">
+                <textarea class="form-control" name="comments" rows="2" placeholder="Additional comments (optional)"></textarea>
+            </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="row mb-3 align-items-center">
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">File</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="file" class="form-control" name="file" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="row mt-3">
+            <div class="col-sm-9 offset-sm-3">
+                <button type="submit" class="btn btn-primary w-100">Submit Deposit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
