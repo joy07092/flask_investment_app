@@ -77,6 +77,17 @@ def users():
     return render_template('users.html')
 
 
+@bp.route("/clients")
+@login_required
+@role_required('Admin')
+def clients():
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            #flash("Direct access to this page is not allowed.", "warning")
+            return redirect(url_for('bp.home'))
+    
+    return render_template('clients.html')
+
+
 
 
 
@@ -137,7 +148,7 @@ def createClient():
         existing_client = Clients.query.filter_by(name=name).first()
         if existing_client:
             flash("Client already exists", "warning")
-            return redirect(url_for("bp.users"))
+            return redirect(url_for("bp.clients"))
 
         
         email = request.form['email'] or None
@@ -176,12 +187,12 @@ def createClient():
         db.session.add(new_client)
         db.session.commit()
         flash("Client created successfully", "success")
-        return redirect(url_for("bp.users"))
+        return redirect(url_for("bp.clients"))
 
     except Exception as e:
         db.session.rollback()
         flash(f"An error occurred: {str(e)}", "danger")
-        return redirect(url_for("bp.users"))
+        return redirect(url_for("bp.clients"))
 
 
 
