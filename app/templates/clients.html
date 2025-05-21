@@ -1,15 +1,66 @@
 {% extends "base.html" %}
+{% import "macros/pagination_macro.html" as macros %}
 
 {% block content %}
-<div class="border p-2" style="margin-top: -70px;">
+<div class="border p-2" style="margin-top: -70px; width: calc(100vw - 250px);">
     <button class="btn btn-primary me-2" onclick="showForm('client-form')">
         <i class="fas fa-plus"></i> Create Client
     </button>
 </div>
 
+<div class="mt-3 p-3" style="margin-left: -90px; width: calc(100vw - 75px);">
+    <table class="table table-bordered table-hover mb-0"
+        style="margin-left: -16px; margin-top: -16px; width: calc(100vw - 75px);">
+        <thead class="table-light">
+            <tr>
+                <th>Client Code</th>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients.items %}
+            <tr>
+                <td>{{ client.id }}</td>
+                <td>{{ client.name }}</td>
+                <td>{{ client.mobile }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.present_address }}</td>
+                <td>
+                    {% if client.status.lower() == 'active' %}
+                    <span class="text-success">{{ client.status }}</span>
+                    {% else %}
+                    <span class="text-danger">{{ client.status }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="#" class="btn btn-outline-primary btn-sm" title="View Full Profile"
+                        onclick="loadContent(`/client_details?client_id={{ client.id }}`); return false;">
+                        <i class="bi bi-person-circle"></i>
+                    </a>
+
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Pagination controls -->
+    {{ macros.render_pagination(clients, 'bp.clients') }}
+</div>
+
+
+
+
+
 
 <!-- Hidden Client Form -->
-<div id="client-form" class="card shadow p-4" style="display: none; max-width: 700px; margin-top: -40px; margin-left: auto; margin-right: auto;">
+<div id="client-form" class="card shadow p-4"
+    style="display: none; max-width: 700px; margin-top: -190px; margin-left: auto; margin-right: auto;">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">Create Client Form</h5>
         <button type="button" class="btn-close" aria-label="Close" onclick="hideForm('client-form')"></button>
@@ -58,13 +109,13 @@
 
         <!-- Image -->
         <div class="row mb-3 align-items-center">
-    <div class="col-sm-3 text-start">
-      <label class="form-label mb-0">Image</label>
-    </div>
-    <div class="col-sm-9">
-      <input type="file" class="form-control" name="image">
-    </div>
-  </div>
+            <div class="col-sm-3 text-start">
+                <label class="form-label mb-0">Image</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="file" class="form-control" name="image">
+            </div>
+        </div>
 
         <!-- Emergency Contact -->
         <div class="row mb-3 align-items-center">
@@ -92,7 +143,8 @@
                 <label class="form-label mb-0">Permanent Address</label>
             </div>
             <div class="col-sm-9">
-                <textarea class="form-control" name="permanent_address" rows="2" placeholder="Permanent Address"></textarea>
+                <textarea class="form-control" name="permanent_address" rows="2"
+                    placeholder="Permanent Address"></textarea>
             </div>
         </div>
 

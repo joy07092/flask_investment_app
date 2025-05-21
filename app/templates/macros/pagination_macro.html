@@ -1,0 +1,75 @@
+{# templates/macros/pagination_macro.html #}
+{% macro render_pagination(pagination, endpoint) %}
+{% if pagination.pages > 1 %}
+<nav style="position: relative; z-index: 0;">
+    <ul class="pagination justify-content-center mt-3">
+
+        {# First Page button #}
+        {% if pagination.page > 1 %}
+        <li class="page-item">
+            <a class="page-link" href="#"
+                onclick="loadContent('{{ url_for(endpoint, page=1, per_page=pagination.per_page) }}'); return false;">
+                First
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">First</span></li>
+        {% endif %}
+
+        {# Previous button #}
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="#"
+                onclick="loadContent('{{ url_for(endpoint, page=pagination.prev_num, per_page=pagination.per_page) }}'); return false;">
+                Previous
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        {# Page numbers #}
+        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+        {% if page_num == pagination.page %}
+        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+        {% else %}
+        <li class="page-item">
+            <a class="page-link" href="#"
+                onclick="loadContent('{{ url_for(endpoint, page=page_num, per_page=pagination.per_page) }}'); return false;">
+                {{ page_num }}
+            </a>
+        </li>
+        {% endif %}
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+        {% endfor %}
+
+        {# Next button #}
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="#"
+                onclick="loadContent('{{ url_for(endpoint, page=pagination.next_num, per_page=pagination.per_page) }}'); return false;">
+                Next
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+        {% endif %}
+
+        {# Last Page button #}
+        {% if pagination.page < pagination.pages %} <li class="page-item">
+            <a class="page-link" href="#"
+                onclick="loadContent('{{ url_for(endpoint, page=pagination.pages, per_page=pagination.per_page) }}'); return false;">
+                Last
+            </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Last</span></li>
+            {% endif %}
+
+    </ul>
+</nav>
+{% endif %}
+{% endmacro %}

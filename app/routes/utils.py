@@ -17,7 +17,7 @@ def nocache(view):
 
 def role_required(role):
     def decorator(f):
-        @wraps(f)
+        @wraps(f)   # ensure function name and docstring of f are preserved in wrapped
         def wrapped(*args, **kwargs):
             if current_user.user_type != role:
                 abort(403)

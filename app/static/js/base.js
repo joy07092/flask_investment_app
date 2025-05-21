@@ -1,32 +1,34 @@
-function loadContent(endpoint) {  //only with button without changing link
+//dynamically load HTML content into a section of page (#content-area) 
+//without reloading the whole page or changing the URL
+function loadContent(endpoint) {  
     fetch(endpoint, {
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest'   // AJAX request, not a full-page browser navigation
         }
     })
-    .then(response => {
-        if (response.status === 401) {
-            // Session expired or unauthorized
-            window.location.href = "/login";
-        }
-        if (!response.ok) throw new Error('Failed to load content');
-        return response.text();
-    })
-    .then(data => {
-        document.getElementById('content-area').innerHTML = data;
-    })
-    .catch(error => {
-        console.error('Error loading content:', error);
-        document.getElementById('content-area').innerHTML = `
+        .then(response => {
+            if (response.status === 401) {
+                // Session expired or unauthorized
+                window.location.href = "/login";
+            }
+            if (!response.ok) throw new Error('Failed to load content');
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('content-area').innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading content:', error);
+            document.getElementById('content-area').innerHTML = `
             <div class="alert alert-danger mt-3" role="alert">
                 Failed to load content.
             </div>`;
-    });
+        });
 }
 
 
 
-function toggleClientId() {
+function toggleClientId() { //create user form, add client id when user is client 
     const userType = document.getElementById('userType')?.value;
     const clientIdField = document.getElementById('clientIdField');
     const clientIdInput = document.getElementById('clientIdInput');
@@ -44,26 +46,26 @@ function toggleClientId() {
 }
 
 
-
+// used in pass view and hide
 function toggleVisibility(id) {
     const input = document.getElementById(id);
     input.type = input.type === "password" ? "text" : "password";
 }
 
+// to hide and show form
 function hideForm(id) {
     const formContainer = document.getElementById(id);
     if (formContainer) {
         const form = formContainer.querySelector('form');
-        if (form) form.reset();  
+        if (form) form.reset();
         formContainer.style.display = 'none';
     }
 }
-
 function showForm(id) {
     const formContainer = document.getElementById(id);
     if (formContainer) {
         const form = formContainer.querySelector('form');
-        if (form) form.reset();  
+        if (form) form.reset();
         formContainer.style.display = 'block';
     }
 }

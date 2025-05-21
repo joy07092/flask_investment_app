@@ -3,7 +3,7 @@ from datetime import datetime
 from flask_login import UserMixin
 from app import login_manager
 
-class Users(UserMixin, db.Model):
+class Users(UserMixin, db.Model):   # model for users and it has all the session-handling behavior Flask-Login needs
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -19,7 +19,7 @@ class Users(UserMixin, db.Model):
     created_by = db.Column(db.String, nullable=True)
     updated_by = db.Column(db.String, nullable=True)
 
-@login_manager.user_loader
+@login_manager.user_loader     # read id from cookie and fetch actual user object from db
 def load_user(user_id):
     return Users.query.get(int(user_id))
 

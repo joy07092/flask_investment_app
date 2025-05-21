@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow mx-auto" style="max-width: 700px; padding: 1.5rem; margin-top: -30px;">
+    <button type="button" class="btn-close position-absolute" style="top: 10px; right: 10px;" aria-label="Close"
+        onclick="loadContent('/clients')"></button>
+    <h5 class="mb-3">Client Full Details</h5>
+    <p><strong>Name:</strong> {{ client.name }}</p>
+    <p><strong>Mobile:</strong> {{ client.mobile }}</p>
+    <p><strong>Email:</strong> {{ client.email or 'N/A' }}</p>
+    <p><strong>NID:</strong> {{ client.nid }}</p>
+    <p><strong>Emergency Contact:</strong> {{ client.emergency_contact or 'N/A' }}</p>
+    <p><strong>Present Address:</strong> {{ client.present_address or 'N/A' }}</p>
+    <p><strong>Permanent Address:</strong> {{ client.permanent_address or 'N/A' }}</p>
+    <p><strong>Nominee Name:</strong> {{ client.nominee_name or 'N/A' }}</p>
+    <p><strong>Nominee NID:</strong> {{ client.nominee_nid or 'N/A' }}</p>
+    <p><strong>Nominee Mobile:</strong> {{ client.nominee_mobile or 'N/A' }}</p>
+    <p><strong>Status:</strong>
+        {% if client.status.lower() == 'active' %}
+        <span class="text-success">{{ client.status }}</span>
+        {% else %}
+        <span class="text-danger">{{ client.status }}</span>
+        {% endif %}
+    </p>
+    {% if client.image %}
+    <div class="text-center mb-3">
+        <img src="{{ url_for('static', filename='uploads/' + client.image) }}" alt="Client Image" class="img-thumbnail"
+            style="max-width: 200px; max-height: 200px;">
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

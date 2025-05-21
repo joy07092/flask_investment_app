@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% import "macros/pagination_macro.html" as macros %}
+
+{% block content %}
+<div class="p-3" style="margin-left: -90px; width: calc(100vw - 75px); margin-top: -50px;">
+    <table class="table table-bordered table-hover mb-0"
+        style="margin-left: -16px; margin-top: -16px; width: calc(100vw - 75px);">
+        <thead class="table-light">
+            <tr>
+                <th>Client ID</th>
+                <th>Date (YYYYMMDD)</th>
+                <th>Amount</th>
+                <th>Comments</th>
+                <th>Action Type</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Created By</th>
+                <th>Updated By</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs.items %}
+            <tr>
+                <td>{{ log.client_id }}</td>
+                <td>{{ log.date }}</td>
+                <td>{{ log.amount }}</td>
+                <td>{{ log.comments }}</td>
+                <td
+                    class="{% if log.action_type == 'delete' %}text-danger{% elif log.action_type == 'update' %}text-warning{% else %}text-success{% endif %} fw-bold">
+                    {{ log.action_type }}
+                </td>
+                <td>{{ log.created_at }}</td>
+                <td>{{ log.updated_at }}</td>
+                <td>{{ log.created_by }}</td>
+                <td>{{ log.updated_by }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination controls -->
+    {{ macros.render_pagination(logs, 'bp.deposit_logs') }}
+</div>
+{% endblock %}

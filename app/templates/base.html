@@ -40,19 +40,19 @@
 
         </div>
         <!-- Flash Messages -->
-    <div class="flash-container">
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
         </div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-</div>
-<!-- End Flash Messages -->
+        <!-- End Flash Messages -->
         <div id="main" class="main-content expanded flex-grow-1">
             <div id="content-area">
                 {% block content %}{% endblock %}

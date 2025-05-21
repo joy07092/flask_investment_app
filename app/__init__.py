@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
-login_manager.login_view = 'bp.login_get'  # Use the endpoint name of login route
+login_manager.login_view = 'bp.login_get'  # redirect to the page when not logged in
 login_manager.init_app(app)
 
 from app.routes.controller import bp

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
-from app.models import Users, Clients, Deposits
+from app.models import Users, Clients, Deposits, Deposit_Logs
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, timezone
 from .utils import nocache, role_required, save_file
@@ -12,7 +12,6 @@ bp = Blueprint("bp", __name__)
 @bp.route("/")
 def starting_url():
     return redirect(url_for('bp.login_get'))
-    #return render_template('users.html')
 
 
 
@@ -29,21 +28,27 @@ def login_get():
     return render_template('login.html')
 
 
+
 @bp.route("/login", methods=['POST'])
 def login_post():
     try:
         user = Users.query.filter_by(username=request.form['username']).first()
 
-        if user and check_password_hash(user.password, request.form['password']):
-            login_user(user)
-            return redirect(url_for('bp.home'))
-        else:
-            flash("Invalid Credentials", "danger")
+        if user:
+            if user.status.lower() == 'inactive':
+                flash("Your account is inactive. Please contact the administrator.", "warning")
+                return redirect(url_for('bp.login_get'))
+
+            if check_password_hash(user.password, request.form['password']):
+                login_user(user)
+                return redirect(url_for('bp.home'))
+
+        flash("Invalid credentials", "danger")
+
     except Exception as e:
         flash(f"An error occurred during login: {str(e)}", "danger")
 
     return redirect(url_for('bp.login_get'))
-
 
 
 
@@ -74,7 +79,91 @@ def users():
             #flash("Direct access to this page is not allowed.", "warning")
             return redirect(url_for('bp.home'))
     
-    return render_template('users.html')
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 1, type=int)
+        users = Users.query.paginate(page=page, per_page=per_page)
+        return render_template('users.html', users=users)
+    except Exception as e:
+        flash("Failed to retrieve users.", "danger")
+        return redirect(url_for('bp.home'))
+    
+
+
+@bp.route("/change_user_password", methods=["GET"]) #admin changing from table
+@login_required
+@role_required("Admin")
+def change_user_password_get():
+    user_id = request.args.get("user_id")
+    if not user_id:
+        flash("User ID is required.", "danger")
+        return redirect(url_for("bp.home"))  
+
+    user = Users.query.get(user_id)
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for("bp.home"))
+
+    return render_template("change_user_password.html", user=user)
+
+
+
+@bp.route("/change_user_password", methods=["POST"]) #admin changing from table
+@login_required
+@role_required("Admin")
+def change_user_password_post():
+    try:
+        user_id = request.form.get("user_id")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        if not (new_password and confirm_password):
+            flash("Both password fields are required.", "warning")
+            return redirect(url_for("bp.home"))
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(url_for("bp.home"))
+
+        user = Users.query.get(user_id)
+        if not user:
+            flash("User not found.", "danger")
+            return redirect(url_for("bp.home"))
+
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+
+        flash(f"Password updated successfully for {user.username}.", "success")
+    except Exception as e:
+        flash(f"An error occurred while changing the password: {str(e)}", "danger")
+
+    return redirect(url_for("bp.users"))
+
+
+
+@bp.route('/change_user_status')
+@login_required
+@role_required('Admin')
+def change_user_status():
+    user_id = request.args.get('user_id')
+    try:
+        if not user_id:
+            return "User ID missing", 400
+
+        user = Users.query.get(user_id)
+        if not user:
+            return "User not found", 404
+
+        
+        user.status = 'Inactive' if user.status.lower() == 'active' else 'Active'
+        db.session.commit()
+
+        return redirect(url_for('bp.users')) 
+
+    except Exception as e:
+        flash("Failed to retrieve user.", "danger")
+        return redirect(url_for('bp.home'))
+
 
 
 @bp.route("/clients")
@@ -82,10 +171,38 @@ def users():
 @role_required('Admin')
 def clients():
     if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return redirect(url_for('bp.home'))
+    
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 1, type=int)
+        clients = Clients.query.paginate(page=page, per_page=per_page)
+        return render_template('clients.html', clients=clients)
+    except Exception as e:
+        flash("Failed to retrieve clients.", "danger")
+        return redirect(url_for('bp.home'))
+
+
+
+@bp.route('/client_details', methods=['GET'])
+@login_required
+@role_required('Admin')
+def client_details():
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             #flash("Direct access to this page is not allowed.", "warning")
             return redirect(url_for('bp.home'))
     
-    return render_template('clients.html')
+    client_id = request.args.get('client_id')
+    if not client_id:
+        return "Client ID not provided", 400
+
+    try:
+        client = db.session.get(Clients, int(client_id))
+        if not client:
+            return "Client not found", 404
+        return render_template('client_details.html', client=client)
+    except Exception as e:
+        return f"An error occurred: {str(e)}", 500
 
 
 
@@ -93,13 +210,172 @@ def clients():
 @login_required
 def deposits():
     if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            #flash("Direct access to this page is not allowed.", "warning")
-            return redirect(url_for('bp.home'))
+        return redirect(url_for('bp.home'))
     
-    return render_template('deposits.html')
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 1, type=int)
+
+        if current_user.user_type.lower() == "admin":
+            deposits = Deposits.query.order_by(Deposits.date.desc()).paginate(page=page, per_page=per_page)
+        else:
+            deposits = Deposits.query.filter_by(client_id=current_user.client_id)\
+                                       .order_by(Deposits.date.desc())\
+                                       .paginate(page=page, per_page=per_page)
+
+        return render_template("deposits.html", deposits=deposits)
+
+    except Exception as e:
+        flash(f"Error loading deposits: {str(e)}", "danger")
+        return redirect(url_for('bp.home'))
 
 
 
+
+@bp.route("/update_deposit")
+@login_required
+def update_deposit():
+    if not request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return redirect(url_for('bp.home'))
+
+    try:
+        deposit_id = request.args.get("deposit_id")
+        if not deposit_id:
+            flash("Deposit ID is missing.", "warning")
+            return redirect(url_for('bp.home'))
+
+        deposit = Deposits.query.get(deposit_id)
+        if not deposit:
+            flash("Deposit not found.", "danger")
+            return redirect(url_for('bp.home'))
+
+        return render_template("deposit_update.html", deposit=deposit)
+
+    except Exception as e:
+        flash("An error occurred while loading the deposit update form.", "danger")
+        print("Error loading update deposit:", e)
+        return redirect(url_for('bp.home'))
+
+
+
+@bp.route("/update_deposit", methods=['POST'])
+@login_required
+def update_deposit_post():
+    try:
+        deposit_id = request.form.get("deposit_id")
+        if not deposit_id:
+            flash("Missing deposit ID.", "danger")
+            return redirect(url_for('bp.home'))
+
+        deposit = Deposits.query.get(deposit_id)
+        if not deposit:
+            flash("Deposit not found.", "danger")
+            return redirect(url_for('bp.home'))
+
+        
+        deposit_log = Deposit_Logs(
+            client_id=deposit.client_id,
+            month=deposit.month.replace("-", ""),
+            date=deposit.date.replace("-", ""),
+            amount=deposit.amount,
+            comments=deposit.comments,
+            created_by=deposit.created_by,
+            created_at=deposit.created_at,
+            action_type="update",
+            updated_at=datetime.now(timezone.utc),
+            updated_by=current_user.username
+        )
+
+        
+        deposit.client_id = request.form.get("client_id")
+        deposit.month = request.form.get("month").replace("-", "") 
+        deposit.date = request.form.get("date").replace("-", "") 
+        deposit.amount = request.form.get("amount")
+        deposit.comments = request.form.get("comments")
+
+        
+        file = request.files.get("file")
+        if file and file.filename:
+            filename = save_file(file)
+            deposit.file = filename
+
+        
+        db.session.add(deposit_log)
+        db.session.commit()
+
+        flash("Deposit updated successfully and logged.", "success")
+        return redirect(url_for('bp.home'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while updating the deposit: {str(e)}", "danger")
+        return redirect(url_for('bp.home'))
+
+
+
+@bp.route("/delete_deposit")
+@login_required
+def delete_deposit():
+    try:
+        deposit_id = request.args.get("deposit_id")
+
+        if not deposit_id:
+            flash("Deposit ID is required.", "danger")
+            return redirect(url_for("bp.home"))
+
+        deposit = Deposits.query.get(deposit_id)
+
+        if not deposit:
+            flash("Deposit not found.", "danger")
+            return redirect(url_for("bp.home"))
+
+        
+        deposit_log = Deposit_Logs(
+            client_id=deposit.client_id,
+            month=deposit.month,
+            date=deposit.date,
+            amount=deposit.amount,
+            comments=deposit.comments,
+            created_by=deposit.created_by,
+            created_at=deposit.created_at,
+            action_type="delete",
+            updated_at=datetime.now(timezone.utc),
+            updated_by=current_user.username
+        )
+
+        
+        db.session.add(deposit_log)
+        db.session.delete(deposit)
+        db.session.commit()
+
+        flash("Deposit deleted and logged successfully.", "success")
+        return redirect(url_for("bp.home"))
+    
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while deleting the deposit: {str(e)}", "danger")
+        return redirect(url_for("bp.home"))
+
+   
+
+@bp.route("/deposit_logs")
+@login_required
+@role_required('Admin')
+def deposit_logs():
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return redirect(url_for('bp.home'))
+
+    try:
+        page = request.args.get('page', 1, type=int) # If the URL is /logs?page=3, then page will be 3
+        per_page = request.args.get('per_page', 1, type=int)
+
+        logs = Deposit_Logs.query.order_by(Deposit_Logs.updated_at.desc()).paginate(page=page, per_page=per_page)
+        # pagination object with attributes (items, page, pages, has_next, has_prev)
+
+        return render_template('deposit_logs.html', logs=logs)
+    except Exception as e:
+        flash(f"Failed to load deposit logs: {str(e)}", "danger")
+        return redirect(url_for('bp.home'))
 
 
 
@@ -117,7 +393,7 @@ def logout():
     except Exception as e:
         flash(f"An error occurred during logout: {str(e)}", "danger")
         return redirect(url_for('bp.home'))
-    
+
 
 
 @bp.route("/profile")
@@ -139,9 +415,6 @@ def profile():
     except Exception as e:
         flash(f"An error occurred while fetching the user profile: {str(e)}", "danger")
         return redirect(url_for('bp.home'))
-
-
-
 
 
 
@@ -205,9 +478,6 @@ def createClient():
         db.session.rollback()
         flash(f"An error occurred: {str(e)}", "danger")
         return redirect(url_for("bp.clients"))
-
-
-
 
 
 
@@ -319,7 +589,7 @@ def createDeposit():
         db.session.add(new_deposit)
         db.session.commit()
         flash("Deposit successfully created.", "success")
-        return redirect(url_for('bp.deposits')) 
+        return redirect(url_for('bp.home')) 
 
     except Exception as e:
         db.session.rollback()
@@ -328,9 +598,7 @@ def createDeposit():
 
 
 
-
-
-@bp.route('/changePassword', methods=['POST'])
+@bp.route('/changePassword', methods=['POST']) # user chaning their own password
 @login_required
 def changePassword():
     try:

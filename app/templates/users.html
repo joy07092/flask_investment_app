@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "macros/pagination_macro.html" as macros %}
 
 {% block content %}
 <div class="border p-2" style="margin-top: -70px;">
@@ -8,13 +9,65 @@
 </div>
 
 
+
+<div class="mt-3 p-3" style="margin-left: -90px; width: calc(100vw - 75px);">
+    <table class="table table-bordered table-hover mb-0"
+        style="margin-left: -16px; margin-top: -16px; width: calc(100vw - 75px);">
+        <thead class="table-light">
+            <tr>
+                <th>User Name</th>
+                <th>User Role</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users.items %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.user_type }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.mobile_number }}</td>
+                <td>
+                    {% if user.status.lower() == 'active' %}
+                    <span class="text-success">{{ user.status }}</span>
+                    {% else %}
+                    <span class="text-danger">{{ user.status }}</span>
+                    {% endif %}
+                </td>
+                <td class="d-flex gap-2">
+                    <!-- Change Password -->
+                    <a href="#" class="btn btn-outline-primary btn-sm" title="Change Password"
+                        onclick="loadContent(`/change_user_password?user_id={{ user.id }}`); return false;">
+                        <i class="bi bi-key-fill"></i>
+                    </a>
+
+                    <!-- Change Status -->
+                    <a href="#" class="btn btn-outline-warning btn-sm" title="Change Status"
+                        onclick="loadContent(`/change_user_status?user_id={{ user.id }}`); return false;">
+                        <i class="bi bi-toggle-on"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {{ macros.render_pagination(users, 'bp.users') }}
+</div>
+
+
+
+
 <!-- Hidden Form -->
-<div id="user-form" class="card shadow p-4" style="display: none; max-width: 700px; margin-top: -40px; margin-left: auto; margin-right: auto;">
+<div id="user-form" class="card shadow p-4"
+    style="display: none; max-width: 700px; margin-top: -190px; margin-left: auto; margin-right: auto;">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">Create User Form</h5>
         <button type="button" class="btn-close" aria-label="Close" onclick="hideForm('user-form')"></button>
     </div>
-    
+
     <form method="POST" action="{{ url_for('bp.createUser') }}">
         <!-- User Type -->
         <div class="row mb-3 align-items-center">
@@ -67,8 +120,10 @@
             </div>
             <div class="col-sm-9">
                 <div class="d-flex align-items-center">
-                    <input type="password" name="password" class="form-control me-2" id="password" required placeholder="Password" style="width: 95%;">
-                    <button type="button" onclick="toggleVisibility('password')" class="btn btn-outline-secondary btn-sm">👁</button>
+                    <input type="password" name="password" class="form-control me-2" id="password" required
+                        placeholder="Password" style="width: 95%;">
+                    <button type="button" onclick="toggleVisibility('password')"
+                        class="btn btn-outline-secondary btn-sm">👁</button>
                 </div>
             </div>
         </div>
@@ -80,8 +135,10 @@
             </div>
             <div class="col-sm-9">
                 <div class="d-flex align-items-center">
-                    <input type="password" name="confirm_password" class="form-control me-2" id="confirmPassword" required placeholder="Confirm Password" style="width: 95%;">
-                    <button type="button" onclick="toggleVisibility('confirmPassword')" class="btn btn-outline-secondary btn-sm">👁</button>
+                    <input type="password" name="confirm_password" class="form-control me-2" id="confirmPassword"
+                        required placeholder="Confirm Password" style="width: 95%;">
+                    <button type="button" onclick="toggleVisibility('confirmPassword')"
+                        class="btn btn-outline-secondary btn-sm">👁</button>
                 </div>
             </div>
         </div>
@@ -110,7 +167,7 @@
             </div>
         </div>
 
-        
+
 
 
 
