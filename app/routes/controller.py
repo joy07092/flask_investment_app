@@ -81,7 +81,7 @@ def users():
     
     try:
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
         users = Users.query.paginate(page=page, per_page=per_page)
         return render_template('users.html', users=users)
     except Exception as e:
@@ -175,7 +175,7 @@ def clients():
     
     try:
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
         clients = Clients.query.paginate(page=page, per_page=per_page)
         return render_template('clients.html', clients=clients)
     except Exception as e:
@@ -214,7 +214,7 @@ def deposits():
     
     try:
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
 
         if current_user.user_type.lower() == "admin":
             deposits = Deposits.query.order_by(Deposits.date.desc()).paginate(page=page, per_page=per_page)
@@ -367,7 +367,7 @@ def deposit_logs():
 
     try:
         page = request.args.get('page', 1, type=int) # If the URL is /logs?page=3, then page will be 3
-        per_page = request.args.get('per_page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
 
         logs = Deposit_Logs.query.order_by(Deposit_Logs.updated_at.desc()).paginate(page=page, per_page=per_page)
         # pagination object with attributes (items, page, pages, has_next, has_prev)
