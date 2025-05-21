@@ -14,7 +14,7 @@
 ### User Creation Form(Admin):
 ![image](https://github.com/joy07092/flask_investment_app/blob/caddb266fafb8961c85595fec20d429c59040fd0/app/static/images/project_ss/create_user.PNG)
 
-### User Password Update(Admin):
+### User Password Update(Admin Action from Table):
 ![image](https://github.com/joy07092/flask_investment_app/blob/caddb266fafb8961c85595fec20d429c59040fd0/app/static/images/project_ss/user_pass_change_admin.PNG)
 
 ### All Clients Page(Admin Action-Create Client, View Client Details):
@@ -47,8 +47,14 @@
 ### User Home Page:
 ![image](https://github.com/joy07092/flask_investment_app/blob/401d9e486b235a2112432910ad302c4b0edae8e0/app/static/images/project_ss/user_home.PNG)
 
-### User Profile Page(Admin, Client):
+### User Profile Page(Admin):
 ![image](https://github.com/joy07092/flask_investment_app/blob/401d9e486b235a2112432910ad302c4b0edae8e0/app/static/images/project_ss/user_profile.PNG)
 
-### User Password Update(Admin, Client):
-![image](https://github.com/joy07092/flask_investment_app/blob/401d9e486b235a2112432910ad302c4b0edae8e0/app/static/images/project_ss/user_profile.PNG)
+### User Profile Page(Client):
+![image](https://github.com/joy07092/flask_investment_app/blob/c523fc17cc61a5f0def021e4192633a4d3fb3724/app/static/images/project_ss/user_profile_client.PNG)
+
+### User Password Update(Admin):
+![image](https://github.com/joy07092/flask_investment_app/blob/c523fc17cc61a5f0def021e4192633a4d3fb3724/app/static/images/project_ss/user_pass_change.PNG)
+
+### User Password Update(Client):
+![image](https://github.com/joy07092/flask_investment_app/blob/518dec1e43f5e49776a446f4c61755ed75debd8c/app/static/images/project_ss/user_pass_change_client.PNG)
